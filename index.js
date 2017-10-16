@@ -1,5 +1,14 @@
+// Here You can type your custom JavaScript...
 var TIMEOUT_IN_SECS = 3 * 60
+var SECOND_TIMEOUT_IN_SECS = 30
 var TEMPLATE = '<h1><span class="js-timer-minutes">00</span>:<span class="js-timer-seconds">00</span></h1>'
+var NOTIFICATIONS = [
+  'Апатия и лень — истинное замерзание души и тела',
+  'Праздность более утомляет, чем труд',
+  'Нет злейшего страдания, как ничего не делать',
+  'Лень — это мать. У нее сын — воровство и дочь — голод.',
+  'Праздный человек есть животное, поедающее время.'
+];
 
 function padZero(number){
   return ("00" + String(number)).slice(-2);
@@ -53,7 +62,7 @@ class TimerWidget{
     // adds HTML tag to current page
     this.timerContainer = document.createElement('div')
 
-    this.timerContainer.setAttribute("style", "height: 100px;")
+    this.timerContainer.setAttribute("style", "height: 70px; width: 100px; z-index: 1000; position: fixed; padding-left: 10px; background-color: yellow; opacity: 0.5; top: 70px; left: 30px")
     this.timerContainer.innerHTML = TEMPLATE
 
     rootTag.insertBefore(this.timerContainer, rootTag.firstChild)
@@ -80,14 +89,34 @@ class TimerWidget{
 function main(){
 
   var timer = new Timer(TIMEOUT_IN_SECS)
+  var secondTimer = new Timer(SECOND_TIMEOUT_IN_SECS)
   var timerWiget = new TimerWidget()
   var intervalId = null
 
   timerWiget.mount(document.body)
 
+  function printAlert() {
+      var random = Math.floor(Math.random() * NOTIFICATIONS.length)
+      window.alert(NOTIFICATIONS[random])
+  }
+
+  function handleSecondTimer(){
+    if (secondTimer.isRunning == false){
+        secondTimer.start()
+    }
+    var secsLeft = secondTimer.calculateSecsLeft()
+    if (secsLeft == '0') {
+        printAlert()
+        secondTimer = new Timer(SECOND_TIMEOUT_IN_SECS)
+    }
+  }
+
   function handleIntervalTick(){
     var secsLeft = timer.calculateSecsLeft()
     timerWiget.update(secsLeft)
+    if (secsLeft == '0') {
+        handleSecondTimer()
+    }
   }
 
   function handleVisibilityChange(){
