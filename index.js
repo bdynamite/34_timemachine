@@ -92,6 +92,7 @@ function main(){
   var secondTimer = new Timer(SECOND_TIMEOUT_IN_SECS)
   var timerWiget = new TimerWidget()
   var intervalId = null
+  var workingTimer = timer
 
   timerWiget.mount(document.body)
 
@@ -101,10 +102,10 @@ function main(){
   }
 
   function handleSecondTimer(){
-    if (secondTimer.isRunning == false){
-        secondTimer.start()
+    if (workingTimer.isRunning == false){
+        workingTimer.start()
     }
-    var secsLeft = secondTimer.calculateSecsLeft()
+    var secsLeft = workingTimer.calculateSecsLeft()
     if (secsLeft == '0') {
         printAlert()
         secondTimer = new Timer(SECOND_TIMEOUT_IN_SECS)
@@ -115,17 +116,19 @@ function main(){
     var secsLeft = timer.calculateSecsLeft()
     timerWiget.update(secsLeft)
     if (secsLeft == '0') {
+        workingTimer = secondTimer
         handleSecondTimer()
     }
   }
 
   function handleVisibilityChange(){
+
     if (document.hidden) {
-      timer.stop()
+      workingTimer.stop()
       clearInterval(intervalId)
       intervalId = null
     } else {
-      timer.start()
+      workingTimer.start()
       intervalId = intervalId || setInterval(handleIntervalTick, 300)
     }
   }
